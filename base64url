@@ -1,0 +1,18 @@
+#!/bin/bash
+
+input=$(cat)
+
+function encode {
+    echo "$input" | base64 | sed -r 's@\+@-@g; s@/@_@g; s@=+$@@g'
+    return 0
+}
+
+function decode {
+    echo "$input" | sed -r 's@-@+@g; s@_@/@g' | base64 -d
+    return 0
+}
+
+case $1 in
+    -d) decode 2> /dev/null;;
+     *) encode 2> /dev/null;;
+esac

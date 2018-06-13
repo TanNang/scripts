@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $(basename $0) <PROC|PID>..."
+    exit 1
+fi
+
+script=$(cat << 'EOF'
+/^[0-9]+:/ {
+    pid = substr($1, 1, length($1) - 1);
+    sub("^[0-9]+:\\s+", "", $0);
+    result[pid]["cmd"] = $0;
+}
+
+/^total\s+kB/ {
+    result[pid]["mem"] = $4;
+}
+
+END {
+    print("   PID       Memory   Command");
+    for (pid in result)
+        printf("%6s   %7.2f MB   %s\n", pid, result[pid]["mem"] / 1024, result[pid]["cmd"]);
+}
+EOF
+)
+
+for arg in "$@"; do
+    if [[ ! "$arg" =~ ^[0-9]+$ ]]; then
+        for pid in "$(pgrep "^$arg$")"; do
+            pids+=" $pid"
+        done
+    else
+        pids+=" $arg"
+    fi
+done
+
+test -z $pids || pmap -x $pids | awk "$script"

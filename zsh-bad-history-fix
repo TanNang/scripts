@@ -1,0 +1,6 @@
+#!/bin/zsh
+cd ~
+cp -af .zsh_history .zsh_history_bad
+strings .zsh_history_bad > .zsh_history
+fc -R .zsh_history
+rm -fr .zsh_history_bad

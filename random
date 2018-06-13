@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function usage() {
+cat << EOF
+Usage: $0 OPTIONS
+OPTIONS := {
+    -l level    complexity level
+         1      alpha
+         2      alpha + digit
+         3      alpha + digit + punct
+         4      all printable characters
+    -n length   length of the string
+    -h --help   display help information
+}
+EOF
+}
+
+while getopts ":l:n:h" OPT; do
+    case $OPT in
+        l) level="$OPTARG";;
+        n) length="$OPTARG";;
+        h) usage 1>&2; exit;;
+        :) echo -e "\e[35mmissing argument to\e[0m \e[31m'-$OPTARG'\e[0m" 1>&2; usage 1>&2; exit 1;;
+    esac
+done
+
+if [[ ! "$length" =~ ^[0-9]+$ ]]; then
+    echo -e "\e[31;1mthe value of the length parameter is not a valid number!\e[0m" 1>&2
+    exit 1
+fi
+
+if [ "$level" = '1' ]; then
+    strings /dev/urandom | tr -cd '[:alpha:]' | head -c$length; echo
+elif [ "$level" = '2' ]; then
+    strings /dev/urandom | tr -cd '[:alnum:]' | head -c$length; echo
+elif [ "$level" = '3' ]; then
+    strings /dev/urandom | tr -cd '[:alnum:][:punct:]' | head -c$length; echo
+elif [ "$level" = '4' ]; then
+    strings /dev/urandom | tr -cd '[:graph:]' | head -c$length; echo
+else
+    echo -e "\e[31;1mthe value of the level parameter is incorrect! (1 ~ 4)\e[0m" 1>&2
+    exit 1
+fi

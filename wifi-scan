@@ -1,0 +1,74 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <NIC>"
+    exit 1
+fi
+
+awk_script=$(cat << 'EOF'
+$1 == "BSS" {
+    split($2, arr, "(");
+    MAC = arr["1"];
+    results[MAC]["enc"] = "Open";
+}
+
+$1 == "freq:" {
+    results[MAC]["freq"] = $2;
+}
+
+$1 == "signal:" {
+    results[MAC]["signal"] = $2 " " $3;
+}
+
+$1 == "SSID:" {
+    if (length($2) == 0)
+        SSID = "<HIDDEN>";
+    else
+        SSID = $2;
+    results[MAC]["ssid"] = SSID;
+}
+
+/^\s*HT[0-9]{2}/ {
+    results[MAC]["bandwidth"] = $1;
+}
+
+/^\s*\* primary channel: [0-9]+/ {
+    results[MAC]["channel"] = $4;
+}
+
+$1 == "WEP:" {
+    enc = results[MAC]["enc"];
+    if (enc == "Open")
+        results[MAC]["enc"] = "WEP";
+}
+
+$1 == "WPA:" {
+    enc = results[MAC]["enc"];
+    if (enc == "Open" || enc == "WEP")
+        results[MAC]["enc"] = "WPA";
+}
+
+$1 == "RSN:" {
+    enc = results[MAC]["enc"];
+    if (enc == "Open" || enc == "WEP" || enc == "WPA")
+        results[MAC]["enc"] = "WPA2";
+}
+
+END {
+    print("       MAC                     SSID   Frequency     Signal     BandWidth   Channel   Security");
+    for (mac in results)
+        printf("%17s   %15s   %4s MHz   %11s   %9s   %5s   %8s\n",
+               mac, results[mac]["ssid"], results[mac]["freq"],
+               results[mac]["signal"], results[mac]["bandwidth"],
+               results[mac]["channel"], results[mac]["enc"]);
+}
+EOF
+)
+
+if [ "$(ip link set dev $1 up &> /dev/null; echo $?)" -ne 0 ]; then
+    echo "Cannot find device '$1'"
+    exit 1
+fi
+
+echo -e "\e[1m$(awk "$awk_script" < /dev/null)\e[0m"
+iw dev $1 scan 2> /dev/null | awk "$awk_script" | tail +2 | sort -nrk5
