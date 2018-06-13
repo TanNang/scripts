@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $(basename $0) <NIC>"
+    exit 1
+fi
+
 while true; do
     send_pre=$(ip -s link show dev $1 | grep 'TX' -A1 | tail -n1 | awk '{print $1}')
     recv_pre=$(ip -s link show dev $1 | grep 'RX' -A1 | tail -n1 | awk '{print $1}')
