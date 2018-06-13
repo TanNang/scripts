@@ -34,4 +34,4 @@ for arg in "$@"; do
     fi
 done
 
-test -z $pids || pmap -x $pids | awk "$script"
+test -z "$(echo "$pids" | sed -r 's@^\s*$@@g')" || pmap -x $pids | awk "$script"
