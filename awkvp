@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ "$1" = '-h' -o "$1" = '--help' -o $# -eq 0 ]; then
+cat << EOF
+Usage: $(basename $0) [-F/pattern/] <expression> [files...]
+  -F/pattern/   split pattern, // is optional
+  expression    perl expression, i.e., 'print \$F[0]'
+  files...      input files, with no file or when file is -, read stdin
+  -h, --help    show this help and exit, without argument is same to -h/--help
+EOF
+exit
+fi
+[[ "$1" == -F* ]] && { delarg="$1"; shift; }; regarg="$1"; shift
+exec perl $delarg -alne "$regarg" "$@"

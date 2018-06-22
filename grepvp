@@ -1,0 +1,12 @@
+#!/bin/sh
+if [ "$1" = '-h' -o "$1" = '--help' -o $# -eq 0 ]; then
+cat << EOF
+Usage: $(basename $0) <regex> [files...]
+  regex       regex pattern, i.e., '/\d+/', '/' can be '@', '%' etc.
+  files...    input files, with no file or when file is -, read stdin
+  -h, --help  show this help and exit, without argument is same to -h/--help
+EOF
+exit
+fi
+regex="$1"; shift
+exec perl -ne "print if -t STDOUT ? s$regex\e[31;1m$&\e[0m${regex:0-1}g : m$regex" "$@"

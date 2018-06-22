@@ -6,3 +6,6 @@
 - `rescan-disk`：扫描新加入的磁盘（SCSI），主要用于 VMware 虚拟机
 - `wifi-scan`：扫描附近可用的 WiFi 并显示结果，如 `wifi-scan wlan0`
 - `zsh-bad-history-fix`：修复 zsh 的 history 文件（异常关机后常常出现）
+- `grepvp`：grep 的简单实现（via perl），如 `grepvp '/systemd/' /etc/passwd`
+- `sedvp`：sed 的简单实现（via perl），如 `sedvp -i.bak 's/\s+/ /g' fred.txt`
+- `awkvp`：awk 的简单实现（via perl），如 `awkvp -F: 'print "$F[0] $F[6]"' /etc/passwd`

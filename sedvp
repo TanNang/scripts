@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ "$1" = '-h' -o "$1" = '--help' -o $# -eq 0 ]; then
+cat << EOF
+Usage: $(basename $0) [-i[SUFFIX]] <regex> [files...]
+  -i[SUFFIX]    edit files in place (makes backup if SUFFIX supplied)
+  regex         regex pattern, i.e., 's/\s++//g', '/' can be '@', '%' etc.
+  files...      input files, with no file or when file is -, read from stdin
+  -h, --help    show this help and exit, without argument is same to -h/--help
+EOF
+exit
+fi
+[[ "$1" == -i* ]] && { extarg="$1"; shift; }; regarg="$1"; shift
+exec perl $extarg -pe "$regarg" "$@"
