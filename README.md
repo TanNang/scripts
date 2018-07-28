@@ -9,3 +9,4 @@
 - `grepvp`：grep 的简单实现（via perl），如 `grepvp '/systemd/' /etc/passwd`
 - `sedvp`：sed 的简单实现（via perl），如 `sedvp -i.bak 's/\s+/ /g' fred.txt`
 - `awkvp`：awk 的简单实现（via perl），如 `awkvp -F: 'print "$F[0] $F[6]"' /etc/passwd`
+- `urldecode`：url 编码（百分号编码）的 decode 脚本，用法 `echo '%e4%b8%ad%e6%96%87' | urldecode`
